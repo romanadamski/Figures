@@ -1,0 +1,71 @@
+﻿@{
+    ViewBag.Title = "Figury";
+}
+<style>
+    .label-text {
+        font-size: large;
+    }
+</style>
+<div class="row">
+    <label class="label-text">Wybierz figurę:</label>
+</div>
+<div class="row">
+    <select id="figures" onchange="getFigure(this.options[this.selectedIndex].value)" class="label-text">
+        <option value="square">Kwadrat</option>
+        <option value="rectangle">Prostokąt</option>
+        <option value="triangle">Trójkąt</option>
+        <option value="circle">Koło</option>
+        <option value="parallelogram">Równoleglobok</option>
+        <option value="diamond">Romb</option>
+        <option value="trapeze">Trapez</option>
+    </select>
+</div>
+<div class="row">
+    <label id="format" class="label-text">Podaj parametry w formacie: </label>
+</div>
+<div class="row">
+    <input type="text" id="parameters">
+    <button type="button" id="calculate" onclick="getResult(document.getElementById('figures').options[document.getElementById('figures').options.selectedIndex].value, document.getElementById('parameters').value)">Oblicz</button>
+</div>
+<div class="row" >
+    <label id="result" class="label-text">Wynik: 0</label>
+</div>
+@section scripts {
+
+    <script>
+        window.onload = function () {
+            getFigure(document.getElementById('figures').options[0].value)
+        };
+
+        function getFigure(selectObject) {
+            $.ajax({
+                type: "GET",
+                url: "/Home/GetDescription?figureName=" + selectObject,
+                data: selectObject,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    document.getElementById('format').innerText = "Podaj parametry w formacie: " + response.text + ". Użyj przecinka jako separatora dziesiętnego.";
+                },
+                error: function () {
+                    console.log("błąd");
+                }
+            });
+        }
+
+        function getResult(selectObject, parameters) {
+            $.ajax({
+                type: "GET",
+                url: "/Home/GetResult?figureName=" + selectObject + "&parameters=" + parameters,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    document.getElementById('result').innerText = "Wynik: " + response.result;
+                },
+                error: function () {
+                    console.log("błąd");
+                }
+            });
+        }
+    </script>
+}
